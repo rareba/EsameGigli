@@ -95,17 +95,15 @@ dfag
 
 #sorting by indices and columns
 
-#per indice
 d$index <- as.numeric(row.names(df))
 df[order(d$index),]
 
-#per colonna
 df[order('AMT_FHA'),]
 
 # Unique values
 unique(df)
 # df['State_Code'].value_counts().head() - boh?
-# df['State_Code'] .isin(df['State_Code'] .head(3)) .head() - boh?
+# df['State_Code'].isin(df['State_Code'] .head(3)) .head() - boh?
 
 ## Handling missing and NA data
 df[is.na(df)]
@@ -127,24 +125,22 @@ s1 + s3
 append(s1, s3)
 
 ## Function application and mapping
-
+testFunc <- function(a, b) a + b
+apply(dat[, c('x', 'z')], 1, function(y) testFunc(y['z'], y['x']))
 
 
 ### Pandas HTML data import example
 
 
 ## Pandas Timestamps
-library(lubridate)
-mdy("Giugno 4, 2016")
-mdy('Lunedì, Giugno 4, 2016 ')
-
-
 as.Date('July 4, 2016', format = '%B %d, %Y')
 as.Date('Monday, July 4, 2016', format = '%A, %B %d, %Y')
-as.Date('Tuesday, July 4th, 2016', format = '%A, %B %dth, %Y')
-as.Date('Monday, July 4th, 2016 05:00 PM', format = '%A, %B %d th, %Y %M:%M %p')
+as.Date('Tuesday, July 4th, 2016', format = '%A, %B %d th, %Y')
+as.Date('lunedý, Luglio 4th, 2016 05:00 PM', format = '%A, %B %d th, %Y %H:%M %p')
+
 as.Date('04/07/2016T17:20:13.123456', format = '%B %d, %Y')
-as.Date(1467651600000000000)
+library(parsedate)
+parse_date(1467651600000000000)
 
 july4 = pd.Timestamp('Monday, July 4th, 2016 05:00 PM') .tz_localize('US/Eastern')
 labor_day = pd.Timestamp('9/5/2016 12:00', tz = 'US/Eastern')
@@ -157,6 +153,13 @@ july4
 july4
 july4
 
+library(bizdays)
+create.calendar("Brazil/ANBIMA", holidaysANBIMA, weekdays = c("saturday", "sunday"))
+business_days = bizseq('2016-01-01', '2016-12-31', "Brazil/ANBIMA")
+
+d <- c("2009-03-07 12:00", "2009-03-08 12:00", "2009-03-28 12:00", "2009-03-29 12:00", "2009-10-24 12:00", "2009-10-25 12:00", "2009-10-31 12:00", "2009-11-01 12:00")
+t1 <- as.POSIXct(d, "America/Los_Angeles")
+cbind(US = format(t1), UK = format(t1, tz = "Europe/London"))
 
 ## Multi-indices, stacking, and pivot tables
 
