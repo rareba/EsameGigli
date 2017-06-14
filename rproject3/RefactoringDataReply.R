@@ -130,7 +130,12 @@ apply(dat[, c('x', 'z')], 1, function(y) testFunc(y['z'], y['x']))
 
 
 ### Pandas HTML data import example
-
+library(RCurl)
+library(XML)
+html =  getURL('http://en.wikipedia.org/wiki/List_of_tallest_buildings_and_structures_in_the_world')
+doc = htmlParse(html, asText = TRUE)
+plain.text <- xpathSApply(doc, "//text()[not(ancestor::script)][not(ancestor::style)][not(ancestor::noscript)][not(ancestor::form)]", xmlValue)
+cat(paste(plain.text, collapse = " "))
 
 ## Pandas Timestamps
 as.Date('July 4, 2016', format = '%B %d, %Y')
