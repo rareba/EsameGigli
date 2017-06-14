@@ -125,3 +125,43 @@ s3 <- c(3, 2, 1)
 names(s3) = c('c', 'd', 'e')
 s1 + s3
 append(s1, s3)
+
+## Function application and mapping
+
+
+
+### Pandas HTML data import example
+
+
+## Pandas Timestamps
+library(lubridate)
+mdy("Giugno 4, 2016")
+mdy('Lunedì, Giugno 4, 2016 ')
+
+
+as.Date('July 4, 2016', format = '%B %d, %Y')
+as.Date('Monday, July 4, 2016', format = '%A, %B %d, %Y')
+as.Date('Tuesday, July 4th, 2016', format = '%A, %B %dth, %Y')
+as.Date('Monday, July 4th, 2016 05:00 PM', format = '%A, %B %d th, %Y %M:%M %p')
+as.Date('04/07/2016T17:20:13.123456', format = '%B %d, %Y')
+as.Date(1467651600000000000)
+
+july4 = pd.Timestamp('Monday, July 4th, 2016 05:00 PM') .tz_localize('US/Eastern')
+labor_day = pd.Timestamp('9/5/2016 12:00', tz = 'US/Eastern')
+thanksgiving = pd.Timestamp('11/24/2016 16:00') # no timezone
+
+labor_day - july4
+
+july4 + 5
+july4
+july4
+july4
+
+
+## Multi-indices, stacking, and pivot tables
+
+
+## Plugging into more advanced analytics
+df$AMT_FHA
+setkey(dt, group)
+system.time(dt[, list(mean = mean(age), sd = sd(age)), by = group])
