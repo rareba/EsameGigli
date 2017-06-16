@@ -1,0 +1,8 @@
+ 
+ 19,15 REAL TIME Take Me Out Intrattenimento 
+ 21,10 REAL TIME Piccoli giganti Intrattenimento 
+ 22,40 REAL TIME Il boss delle cerimonie Varie 
+ 23,50 REAL TIME 24 ore al pronto soccorso Varie 
+ 01,45 REAL TIME Malattie misteriose Documentario 
+ 03,30 REAL TIME Body Bizarre Documentario 
+ 05,10 REAL TIME Alta infedelta Documentario 

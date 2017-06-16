@@ -109,6 +109,7 @@ unique(df)
 df[is.na(df)]
 dfnaomit = df[na.omit[df]]
 dfna0 = df[is.na(df)] <- 0
+#usare ZOO
 
 ## Manipulating strings
 dfstring <- df[grep("stringa", df$AMT_FHA),]
@@ -145,7 +146,7 @@ as.Date('lunedý, Luglio 4th, 2016 05:00 PM', format = '%A, %B %d th, %Y %H:%M %p
 
 as.Date('04/07/2016T17:20:13.123456', format = '%B %d, %Y')
 library(parsedate)
-parse_date(1467651600000000000)
+as.Date(1467651600000000000)
 
 july4 = pd.Timestamp('Monday, July 4th, 2016 05:00 PM') .tz_localize('US/Eastern')
 labor_day = pd.Timestamp('9/5/2016 12:00', tz = 'US/Eastern')
