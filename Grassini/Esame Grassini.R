@@ -1,3 +1,5 @@
+# COMPITO SULLE REGOLE ASSOCIATIVE
+
 # Carico le librerie e inizializzo l'oggetto Groceries
 library(arules)
 library(datasets)
@@ -45,3 +47,41 @@ str(df, list = 101)
 db
 # ricordarsi di fare na.omit sui dati
 # ricordarsi di fare trans3 = as(dbEse, "transactions")
+
+
+# COMPITO ALBERI DECISIONALI
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# COMPITO SU ANALISI CLUSTER
+
