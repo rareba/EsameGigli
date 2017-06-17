@@ -259,3 +259,6 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+/Gigli/Management science/Cutomer_Segmentation Advanced.R
+/Gigli/Management science/Data/trip_fare_4.csv
+/Gigli/Management science/Data/trip_data_4.csv

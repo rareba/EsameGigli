@@ -11,6 +11,14 @@
   <PropertyGroup>
     <StartupFile>RefactoringDataReply.R</StartupFile>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="..\..\..\..\..\Desktop\trip_data_4.csv">
+      <Link>Management science\trip_data_4.csv</Link>
+    </Content>
+    <Content Include="..\..\..\..\..\Desktop\trip_fare_4.csv">
+      <Link>Management science\trip_fare_4.csv</Link>
+    </Content>
+  </ItemGroup>
   <ProjectExtensions>
     <VisualStudio>
       <UserProperties />
