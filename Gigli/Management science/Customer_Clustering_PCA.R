@@ -59,7 +59,7 @@ table(fit$cluster)
 
 barplot(table(fit$cluster), col="maroon")
 
-autoplot(fit, data=dat[,-1], frame=TRUE)
+autoplot(fit, data = dat[, -1], frame = TRUE)
 
 # A really cool trick that the probably didn't teach you in school is Principal Component Analysis. 
 # There are lots of uses for it, but today we're going to use it to transform our multi-dimensional 
@@ -100,6 +100,8 @@ transactions %>%
   left_join(data_frame(customer_name=dat$customer_name, 
                        cluster=fit$cluster)) %>% 
   left_join(offers) -> customer_clusters
+
+head(customer_clusters)
 
 customer_clusters %>% 
   mutate(is_1=(cluster==1)) %>% 
