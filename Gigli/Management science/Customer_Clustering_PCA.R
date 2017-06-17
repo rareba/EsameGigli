@@ -24,7 +24,7 @@ colnames(offers) <- c("offer_id", "campaign", "varietal", "min_qty", "discount",
 head(offers)
 
 #Read Transactional Data
-transactions <- read_excel(fil, sheet = 2)
+transactions <- read.csv("~/Visual Studio 2017/Projects/MABIDA2017/Gigli/Management science/WineKMCTransactions.csv", header = F, sep = ";")
 colnames(transactions) <- c("customer_name", "offer_id")
 transactions$n <- 1
 
