@@ -1,4 +1,3 @@
-library(readxl)    # free data from excel hades
 library(dplyr)     # sane data manipulation
 library(tidyr)     # sane data munging
 library(viridis)   # sane colors
@@ -7,18 +6,18 @@ library(ggfortify) # super-helpful for plotting non-"standard" stats objects
 
 my_seed = 0
 set.seed(my_seed)
-setwd("/home/asus/workspace/Management Data Science/Moduli/04 Customer Segmentation in R/Data")
+setwd("~/Visual Studio 2017/Projects/MABIDA2017/Gigli/Management science/")
 
 #The dataset contains both information on marketing newsletters/e-mail campaigns (e-mail offers sent) and 
 #transaction level data from customers (which offer customers responded to and what they bought).
 
 #get data
-url <- "http://blog.yhathq.com/static/misc/data/WineKMC.xlsx"
-d.file <- basename(url)
-if (!file.exists(d.file)) download.file(url, d.file)
+#url <- "http://blog.yhathq.com/static/misc/data/WineKMC.xlsx"
+#d.file <- basename(url)
+#if (!file.exists(d.file)) download.file(url, d.file)
 
 #Read Campaign Data
-offers <- read_excel(d.file, sheet = 1)
+offers <- read.csv("~/Visual Studio 2017/Projects/MABIDA2017/Gigli/Management science/WineKMCOffers.csv", header = F, sep = ";")
 colnames(offers) <- c("offer_id", "campaign", "varietal", "min_qty", "discount", "origin", "past_peak")
 
 #Show Campaign Data
