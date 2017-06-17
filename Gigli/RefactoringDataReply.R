@@ -31,21 +31,26 @@ weajson$currentobservation
 
 # Parte 2 - giocare con i dati
 
+
+## Nouns (objects) in Pandas
+### Data Frames
+
 number = c(1, 2, 3)
 animal = c('cat', 'dog', 'mouse')
 df1 = data.frame(number, animal)
+df1
 
 df1$animal
-str(df1)
 
-df2 = t(df1)
-
+## Verbs (operations) in Pandas
+## Loading data (and basic statistics / visualization)
+library(readr)
 names = c("State_Code", "County_Code", "Census_Tract_Number", "NUM_ALL", "NUM_FHA", "PCT_NUM_FHA", "AMT_ALL", "AMT_FHA", "PCT_AMT_FHA")
-df = read_csv('small_data/fha_by_tract.csv', names = names) # Manca il csv nella cartella di dropbox!
-df.head(3)
+df = na.omit(read_csv("~/Visual Studio 2017/Projects/MABIDA2017/Gigli/Management science/Data/fha_by_tract.csv", col_names = names))
+head(df)
 
-df$GEOID = df$Census_Tract_Number * 100 + 10 ** 6 * df$County_Code + 10 ** 9 * df$State_Code
-df.head()
+df$GEOID = with(df, ((as.numeric(Census_Tract_Number) * 100) + (10 ^ 6 * as.numeric(County_Code)) + (10 ^ 9 * as.numeric(State_Code))))
+head(df)
 
 # df$GEOID = NULL - ma perche' dovrei droppare una colonna?
 
