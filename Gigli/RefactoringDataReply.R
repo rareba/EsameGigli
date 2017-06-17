@@ -46,16 +46,19 @@ df1$animal
 ## Loading data (and basic statistics / visualization)
 library(readr)
 names = c("State_Code", "County_Code", "Census_Tract_Number", "NUM_ALL", "NUM_FHA", "PCT_NUM_FHA", "AMT_ALL", "AMT_FHA", "PCT_AMT_FHA")
-df = na.omit(read_csv("~/Visual Studio 2017/Projects/MABIDA2017/Gigli/Management science/Data/fha_by_tract.csv", col_names = names))
+df = as.data.frame(na.omit(read_csv("~/Visual Studio 2017/Projects/MABIDA2017/Gigli/Management science/Data/fha_by_tract.csv", col_names = names)))
 head(df)
 
 df$GEOID = with(df, ((as.numeric(Census_Tract_Number) * 100) + (10 ^ 6 * as.numeric(County_Code)) + (10 ^ 9 * as.numeric(State_Code))))
 head(df)
 
-# df$GEOID = NULL - ma perche' dovrei droppare una colonna?
+df$GEOID = NULL # ma perche' dovrei droppare una colonna?
+df = df[-c(2, 4),] # droppo righe 2 e 4
 
-rownames(df) <- df$State_Code #assegna indici al dataframe, multiindex con workaround non raccomandabile
-rownames(df) = NULL #rimuovi indici?
+#impossibile mettere una colonna con valori non univoci come indice
+# row.names(df) <- df$State_Code
+
+str(df)
 
 library(psych)
 describeBy(df, df$PCT_AMT_FHA)
@@ -63,7 +66,7 @@ hist(df$PCT_AMT_FHA, breaks = 50, col = rgb(1, 0, 0, 0.5))
 
 df$LOG_AMT_ALL = log1p(df$AMT_ALL)
 
-#indexing data frames
+## Indexing data frames
 
 head(df$State_Code)
 
