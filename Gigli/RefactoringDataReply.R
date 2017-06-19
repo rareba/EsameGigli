@@ -1,4 +1,4 @@
-# Parte 1 - prendere i dati
+﻿# Parte 1 - prendere i dati
 
 library(httr)
 
@@ -13,10 +13,10 @@ paramA <- list(q = ad, addressdetails = 1, format = "json")
 
 resA <- WScall(urla, paramA)
 
-if (resA$status_code == 200) { 
-adrjson <- content(resA, as = "parsed")
-lat = adrjson[[1]]$lat
-lon = adrjson[[1]]$lon
+if (resA$status_code == 200) {
+    adrjson <- content(resA, as = "parsed")
+    lat = adrjson[[1]]$lat
+    lon = adrjson[[1]]$lon
 }
 
 urlw <- "http://forecast.weather.gov/MapClick.php"
@@ -25,8 +25,8 @@ paramW <- list(lat = lat, lon = lon, FcstType = "json")
 resW <- WScall(urlw, paramW)
 
 if (resW$status_code == 200) {
-weajson <- content(resW, as = "parsed")
-weajson$currentobservation
+    weajson <- content(resW, as = "parsed")
+    weajson$currentobservation
 }
 
 # Parte 2 - giocare con i dati
@@ -55,8 +55,12 @@ head(df)
 df$GEOID = NULL # ma perche' dovrei droppare una colonna?
 df = df[-c(2, 4),] # droppo righe 2 e 4
 
-#impossibile mettere una colonna con valori non univoci come indice
-# row.names(df) <- df$State_Code
+# Indici su data frame
+library(data.table)
+dt <- as.data.table(df)
+setkey(dt, State_Code, County_Code)
+head(dt)
+data.frame(unclass(summary(dt)))
 
 str(df)
 
@@ -78,7 +82,7 @@ df[, 4]
 
 df[3, 'State_Code']
 
-df[0:3, "State_Code":'Census_Tract_Number']
+df[0:3, "State_Code":'Census_Tract_Number'] ############## rivedere
 
 df[3, 0]
 
@@ -86,15 +90,16 @@ df[0:3, 0:3]
 
 #filtering data
 
-head(subset(df, State_Code == 1))
-head(subset(df, State_Code == 1 | Census_Tract_Number == 9613))
-head(df[df$State_Code == 5])
+head(subset(df, State_Code == 33))
+head(subset(df, State_Code == 33 | Census_Tract_Number == 9613))
+df[State_Code == 33] ########### rivedere
 
 #joining data
 
-df2 = read_csv('small_data/2013_Gaz_tracts_national.csv', sep = '\t') # Manca il csv nella cartella di dropbox!
+df2 = read_csv('~/Visual Studio 2017/Projects/MABIDA2017/Gigli/Management science/Data/2013_Gaz_tracts_national.csv', sep = '\t')
+df2 = as.data.frame(na.omit(read_tsv("~/Visual Studio 2017/Projects/MABIDA2017/Gigli/Management science/Data/2013_Gaz_tracts_national.tsv", col_names = T)))
 head(df2)
-df_joined = marge(df1, df2, by = 'GEOID')
+df_joined = merge(df1, df2, by = 'GEOID') ####################rivedere
 head(df_joined)
 
 #aggregating data
@@ -139,22 +144,28 @@ apply(dat[, c('x', 'z')], 1, function(y) testFunc(y['z'], y['x']))
 
 
 ### Pandas HTML data import example
-library(RCurl)
-library(XML)
-html =  getURL('http://en.wikipedia.org/wiki/List_of_tallest_buildings_and_structures_in_the_world')
-doc = htmlParse(html, asText = TRUE)
-plain.text <- xpathSApply(doc, "//text()[not(ancestor::script)][not(ancestor::style)][not(ancestor::noscript)][not(ancestor::form)]", xmlValue)
-cat(paste(plain.text, collapse = " "))
+library(htmltab)
+library(stringi)
+
+url <- "http://en.wikipedia.org/wiki/List_of_tallest_buildings_and_structures_in_the_world"
+tallest <- htmltab(doc = url, which = 3)
+tl = t(as.data.table(stri_extract_all(tallest$Coordinates, regex = "-?\\d{1,3}+\\.?\\d{4,6}")))
+tallest$Latitude = tl[, 3]
+tallest$Longitude = tl[, 4]
+head(tallest)
+
+cleancord = function(string) {
+pattern = ""
+}
 
 ## Pandas Timestamps
-as.Date('July 4, 2016', format = '%B %d, %Y')
-as.Date('Monday, July 4, 2016', format = '%A, %B %d, %Y')
-as.Date('Tuesday, July 4th, 2016', format = '%A, %B %d th, %Y')
-as.Date('luned�, Luglio 4th, 2016 05:00 PM', format = '%A, %B %d th, %Y %H:%M %p')
-
-as.Date('04/07/2016T17:20:13.123456', format = '%B %d, %Y')
-library(parsedate)
-as.Date(1467651600000000000)
+Sys.setlocale("LC_TIME", "C")
+as.POSIXlt("July 4, 2016", format = "%B %d, %Y")
+as.POSIXlt('Monday, July 4, 2016', format = "%A, %B %d, %Y")
+as.POSIXlt('Tuesday, July 4th, 2016', format = "%A, %B %dth, %Y")
+as.POSIXlt('Monday, July 4th, 2016 05:00 PM', format = "%A, %B %dth, %Y %I:%M %p")
+as.POSIXlt('04/07/2016T17:20:13.123456', format = "%d/%m/%YT%H:%M:%OS")
+as.Date(as.POSIXlt(1467651600000000000 / 1000000000, origin = "1970-01-01"))
 
 july4 = pd.Timestamp('Monday, July 4th, 2016 05:00 PM') .tz_localize('US/Eastern')
 labor_day = pd.Timestamp('9/5/2016 12:00', tz = 'US/Eastern')
@@ -182,3 +193,5 @@ cbind(US = format(t1), UK = format(t1, tz = "Europe/London"))
 df$AMT_FHA
 setkey(dt, group)
 system.time(dt[, list(mean = mean(age), sd = sd(age)), by = group])
+
+╗┐ / ´╗┐
