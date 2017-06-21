@@ -1,12 +1,5 @@
 ﻿# Librerie da installare
-install.packages(httr)
-install.packages(readr)
-install.packages(data.table)
-install.packages(psych)
-install.packages(htmltab)
-install.packages(stringi)
-install.packages(bizdays)
-
+install.packages(c('httr', 'readr', 'data.table', 'psych', 'htmltab', 'stringi', 'bizdays', 'stringr', 'dyplr', 'timeDate'))
 
 # Parte 1 - prendere i dati
 
@@ -166,7 +159,7 @@ rm(tl)
 head(tallest)
 
 
-## Pandas Timestamps--- FINIRE
+## Pandas Timestamps
 Sys.setlocale("LC_TIME", "C")
 as.POSIXlt("July 4, 2016", format = "%B %d, %Y")
 as.POSIXlt('Monday, July 4, 2016', format = "%A, %B %d, %Y")
@@ -175,20 +168,27 @@ as.POSIXlt('Monday, July 4th, 2016 05:00 PM', format = "%A, %B %dth, %Y %I:%M %p
 as.POSIXlt('04/07/2016T17:20:13.123456', format = "%d/%m/%YT%H:%M:%OS")
 as.Date(as.POSIXlt(1467651600000000000 / 1000000000, origin = "1970-01-01"))
 
-july4 = pd.Timestamp('Monday, July 4th, 2016 05:00 PM') .tz_localize('US/Eastern')
-labor_day = pd.Timestamp('9/5/2016 12:00', tz = 'US/Eastern')
-thanksgiving = pd.Timestamp('11/24/2016 16:00') # no timezone
+july4 = as.POSIXct('Monday, July 4th, 2016 05:00 PM', format = "%A, %B %dth, %Y %I:%M %p", tz = "US/Eastern")
+labor_day = as.POSIXct('9/5/2016 12:00', format = "%d/%m/%Y %H:%M", tz = "US/Eastern")
+thanksgiving = as.POSIXct('11/24/2016 16:00', format = "%m/%d/%Y %H:%M")
 
 labor_day - july4
-
-july4 + 5
-july4
-july4
-july4
-
 library(bizdays)
+add.bizdays(july4,5)
+add.bizdays(july4, -1)
+
+library(timeDate)
+if (is.bizday(timeLastDayInMonth(july4)) = TRUE) {
+timeLastDayInMonth(july4)       # Migliorabile!
+}
+
+require(bizdays)
 create.calendar("Brazil/ANBIMA", holidaysANBIMA, weekdays = c("saturday", "sunday"))
 business_days = bizseq('2016-01-01', '2016-12-31', "Brazil/ANBIMA")
+business_days
+
+dtimed = data.table(x = business_days, y = seq(1, length(business_days)))
+setkey(dtimed, x)
 
 d <- c("2009-03-07 12:00", "2009-03-08 12:00", "2009-03-28 12:00", "2009-03-29 12:00", "2009-10-24 12:00", "2009-10-25 12:00", "2009-10-31 12:00", "2009-11-01 12:00")
 t1 <- as.POSIXct(d, "America/Los_Angeles")
@@ -196,3 +196,4 @@ cbind(US = format(t1), UK = format(t1, tz = "Europe/London"))
 
 ## Multi-indices, stacking, and pivot tables       ---- CESTINATO
 
+ dt_joined[, list(sumNUM = sum('NUM_ALL'), sumFHA = sum('NUM_FHA')), by = .('State_Code', 'County_Code')]
