@@ -1,5 +1,5 @@
 ﻿# Librerie da installare
-install.packages(c('httr', 'readr', 'data.table', 'psych', 'htmltab', 'stringi', 'bizdays', 'stringr', 'dyplr', 'lubridate', 'zoo'))
+install.packages(c('httr', 'readr', 'data.table', 'psych', 'htmltab', 'stringi', 'bizdays', 'stringr', 'dplyr', 'lubridate', 'zoo'))
 
 # Parte 1 - prendere i dati
 
