@@ -1,5 +1,5 @@
 ﻿# Librerie da installare
-install.packages(c('httr', 'readr', 'data.table', 'psych', 'htmltab', 'stringi', 'bizdays', 'stringr', 'dplyr', 'lubridate', 'zoo'))
+install.packages(c('httr', 'readr', 'data.table', 'psych', 'htmltab', 'stringi', 'bizdays', 'stringr', 'dplyr', 'lubridate', 'zoo', 'reshape2'))
 
 # Parte 1 - prendere i dati
 
@@ -238,5 +238,11 @@ cbind(US = format(t1), UK = format(t1, tz = "Europe/London"))
 
 ## Multi-indices, stacking, and pivot tables
 grouped = group_by(dt_joined, State_Code, County_Code)
-grouped1 <- summarise(grouped, NUM_ALL = sum(NUM_ALL), NUM_FHA = sum(NUM_FHA))
-head(grouped1)
+grouped_summ = summarise(grouped,
+                        sum_NUM_ALL = sum(NUM_ALL),
+                        sum_NUM_FHA = sum(NUM_FHA))
+
+head(grouped_summ)
+library(reshape2)
+unstacked = dcast(grouped_summ, State_Code ~ County_Code, value.var = "sum_NUM_FHA")
+head(unstacked)
