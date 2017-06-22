@@ -81,7 +81,7 @@ head(dt$State_Code)
 
 head(dt[,c(State_Code, County_Code)])
 head(dt[, County_Code, keyby = State_Code])
-str(df$State_Code)
+str(dt$State_Code)
 
 dt[12550,]
 
@@ -108,6 +108,7 @@ dt_joined = dt[dt2, on = "GEOID"]
 head(dt_joined)
 
 #aggregating data
+library(dplyr)
 usps_groups = group_by(dt_joined, USPS)
 usps_groups
 group_AK_5 <- filter(usps_groups, USPS == 'AK')[5,]
@@ -161,9 +162,9 @@ dt[, c('GEOID', 'FILL0', 'FILL_mean', 'FILL_inter')][1:10,]
 
 ## Manipulating strings
 library(stringr)
-library(dplyr)
 
 dtstring = dt_joined %>% filter(str_detect(USPS, "A"))
+dtstring
 
 ## Indices in Pandas
 s1 <- c(1, 2, 3)
