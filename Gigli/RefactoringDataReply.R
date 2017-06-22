@@ -246,3 +246,7 @@ head(grouped_summ)
 library(reshape2)
 unstacked = dcast(grouped_summ, State_Code ~ County_Code, value.var = "sum_NUM_FHA")
 head(unstacked)
+
+
+IRkernel::installspec()
+IRkernel::installspec(user = FALSE)
