@@ -1,7 +1,7 @@
 # Con variabile dipendente categorica/discreta
 #install.packages("C50")
 library(C50)
-setwd("C:/Users/GiulioVannini/Documents/Visual Studio 2017/Projects/MABIDA2017/Grassini")
+setwd("F:/CORSO MIO 2017/ARULES")
 crx <- read.table( file="expanded_AGARICUS_LEPIOTA.txt", header=TRUE, sep="," )
 head(crx)
 summary(crx)
@@ -56,7 +56,7 @@ library(rpart)
 library(rpart.plot)
 
 #### File (adjust path)
-file.data <- "C:/Users/GiulioVannini/Documents/Visual Studio 2017/Projects/MABIDA2017/Grassini/Income-training.csv"
+file.data <- "F:/CORSO MIO 2017/TREE/Income-training.csv"
 remove <- c("", "Numero.di.FamiglieProvincia", "Numero.di.FamiglieRegione")
 #### Read data
 data <- read.table(file = file.data, header = TRUE, sep = ",", 
@@ -108,8 +108,7 @@ ind <- which.min(fit$cptable[, "xerror"])
 # Potatura
 fit.prune <- prune(tree = fit, cp = fit$cptable[ind, "CP"]) 
 print(fit.prune)
-plot(fit.prune)
-text(fit.prune)
+
 # Valutiamo il modello sul data test
 dat<-datate[,c("Regione","Popolazione.TotaleProvincia","Numero.medio.di.componenti.per.famigliaProvincia",
             "contribuenti")]
@@ -123,4 +122,3 @@ plot(SE)
 summary(predizione)
 predizione[1:20]
 datate[,"gini.index"][1:20]
-           
