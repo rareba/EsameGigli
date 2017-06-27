@@ -102,15 +102,6 @@ inspect(gromilk2[1:10])
 
 
 
-#Esercizio 2
-
-#leggi il csv
-df=csv
-str(df, list = 101)
-db
-# ricordarsi di fare na.omit sui dati
-# ricordarsi di fare trans3 = as(dbEse, "transactions")
-
 
 
 

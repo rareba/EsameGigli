@@ -19,8 +19,23 @@ n=20; scale=1;
       y=c(y,(rnorm(n)*scale+my))
 mat_well<-cbind(c(rep(1,n),rep(2,n),rep(3,n)),x,y)
 colnames(mat_well)<-c('G-vero','x','y')
-plot(x,y,pch=19,col=mat_well[,1])
+plot(x, y, pch = 19, col = mat_well[, 1])
 
+d = mat_well[,2:3]
+avgclust <- hclust(dist(d), method = 'average')
+sinclust <- hclust(dist(d), method = 'single')
+comclust <- hclust(dist(d), method = 'complete')
+wardclust <- hclust(dist(d), method = 'ward')
+pamclust <- pam(dist(d), 4)
+kmeansclust <- kmeans(dist(d),4)
+
+
+# comparing 2 cluster solutions
+library(fpc)
+cluster.stats(d, fit1$cluster, fit2$cluster)
+
+clusters <- hclust(dist(iris[, 3:4]))
+plot(clusters)
 
 ### cluster poco separati
 set.seed(10)
