@@ -4,6 +4,33 @@ palette(rainbow(3))
 ##  CAMBIARE IL PARAMETRO DEL COMANDO set.seed PER PERSONALIZZARE L'ESERCIZIO
 #####################################################
 #####################################################
+library(cluster)
+dfcluster = function(data) {
+    d = dist(data[, 2:3])
+    average <- cutree(hclust(d, method = 'average'), 3)
+    single <- cutree(hclust(d, method = 'single'), 3)
+    complete <- cutree(hclust(d, method = 'complete'), 3)
+    ward <- cutree(hclust(d, method = 'ward.D'), 3)
+    pam <- pam(d, 3)
+    kmeans <- kmeans(d, 3)
+
+    df = data.frame(data[, 1], average, single, complete, ward, pam$clustering, kmeans$cluster)
+    colnames(df) = c("orig", "avg", "sin", "compl", "ward", "pam", "kmeans")
+    return(df)
+}
+
+dfperc = function(data) {
+ denom = nrow(data)
+avgp = paste0(round((sum(data$orig == data$avg) / denom) * 100), "%")
+sinp = paste0(round((sum(data$orig == data$sin) / denom) * 100), "%")
+comp = paste0(round((sum(data$orig == data$compl) / denom) * 100), "%")
+wardp = paste0(round((sum(data$orig == data$ward) / denom) * 100), "%")
+pamp = paste0(round((sum(data$orig == data$pam) / denom) * 100), "%")
+kmep = paste0(round((sum(data$orig == data$kmeans) / denom) * 100), "%")
+
+    perc = c(avgp,sinp,comp,wardp,pamp,kmep)
+      return(perc)
+}
 
 ## cluster  ben separati
 set.seed(10)
@@ -21,21 +48,8 @@ mat_well<-cbind(c(rep(1,n),rep(2,n),rep(3,n)),x,y)
 colnames(mat_well)<-c('G-vero','x','y')
 plot(x, y, pch = 19, col = mat_well[, 1])
 
-d = mat_well[,2:3]
-avgclust <- hclust(dist(d), method = 'average')
-sinclust <- hclust(dist(d), method = 'single')
-comclust <- hclust(dist(d), method = 'complete')
-wardclust <- hclust(dist(d), method = 'ward')
-pamclust <- pam(dist(d), 4)
-kmeansclust <- kmeans(dist(d),4)
+dfw = dfperc(dfcluster(mat_well))
 
-
-# comparing 2 cluster solutions
-library(fpc)
-cluster.stats(d, fit1$cluster, fit2$cluster)
-
-clusters <- hclust(dist(iris[, 3:4]))
-plot(clusters)
 
 ### cluster poco separati
 set.seed(10)
@@ -53,7 +67,7 @@ mat_poor<-cbind(c(rep(1,n),rep(2,n),rep(3,n)),x,y)
 colnames(mat_poor)<-c('G-vero','x','y')
 plot(x,y,pch=19,col=mat_poor[,1])
 
-
+dfp= dfcluster(mat_poor)
 
 ### cluster allungati
 set.seed(19);
@@ -70,6 +84,8 @@ mat_lunghi<-cbind(c(rep(1,n),rep(2,n)),x,y)
 colnames(mat_lunghi)<-c('G-vero','x','y')
 plot(x,y,pch=19,col=mat_lunghi[,1])
 
+dfl = dfcluster(mat_lunghi)
+
 ### cluster nonconvessi
 set.seed(10);
 n<-100
@@ -80,3 +96,8 @@ i<-1:n
 mat_nconv<-cbind(c(rep(1,n/2),rep(2,n/2)),x,y)
 colnames(mat_nconv)<-c('G-vero','x','y')
 plot(x,y,pch=19,col=mat_nconv[,1])
+
+dfperc(dfcluster(mat_well))
+dfperc(dfcluster(mat_poor))
+dfperc(dfcluster(mat_lunghi))
+dfperc(dfcluster(mat_nconv))
