@@ -24,7 +24,7 @@ dfcluster = function(data) {
     pamp = paste0(round((sum(df$orig == df$pam) / denom) * 100), "%")
     kmep = paste0(round((sum(df$orig == df$kmeans) / denom) * 100), "%")
 
-    perc = c(avgp, sinp, comp, wardp, pamp, kmep)
+    perc = c(sinp, comp, avgp, wardp, kmep, pamp)
     return(perc)
 }
 
@@ -88,7 +88,11 @@ mat_nconv<-cbind(c(rep(1,n/2),rep(2,n/2)),x,y)
 colnames(mat_nconv)<-c('G-vero','x','y')
 plot(x,y,pch=19,col=mat_nconv[,1])
 
-dfcluster(mat_well)
-dfcluster(mat_poor)
-dfcluster(mat_lunghi)
-dfcluster(mat_nconv)
+grpsep = dfcluster(mat_well)
+grp_poco_sep = dfcluster(mat_poor)
+grp_allungati = dfcluster(mat_lunghi)
+grp_non_conv = dfcluster(mat_nconv)
+
+tab = t(data.frame(grpsep, grp_poco_sep, grp_allungati, grp_non_conv))
+colnames(tab) = c("single link", "complete link", "group avg", "ward", "k-means", "pam")
+tab
