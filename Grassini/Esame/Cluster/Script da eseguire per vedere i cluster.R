@@ -16,24 +16,20 @@ dfcluster = function(data) {
 
     df = data.frame(data[, 1], average, single, complete, ward, pam$clustering, kmeans$cluster)
     colnames(df) = c("orig", "avg", "sin", "compl", "ward", "pam", "kmeans")
-    return(df)
-}
+    denom = nrow(df)
+    avgp = paste0(round((sum(df$orig == df$avg) / denom) * 100), "%")
+    sinp = paste0(round((sum(df$orig == df$sin) / denom) * 100), "%")
+    comp = paste0(round((sum(df$orig == df$compl) / denom) * 100), "%")
+    wardp = paste0(round((sum(df$orig == df$ward) / denom) * 100), "%")
+    pamp = paste0(round((sum(df$orig == df$pam) / denom) * 100), "%")
+    kmep = paste0(round((sum(df$orig == df$kmeans) / denom) * 100), "%")
 
-dfperc = function(data) {
- denom = nrow(data)
-avgp = paste0(round((sum(data$orig == data$avg) / denom) * 100), "%")
-sinp = paste0(round((sum(data$orig == data$sin) / denom) * 100), "%")
-comp = paste0(round((sum(data$orig == data$compl) / denom) * 100), "%")
-wardp = paste0(round((sum(data$orig == data$ward) / denom) * 100), "%")
-pamp = paste0(round((sum(data$orig == data$pam) / denom) * 100), "%")
-kmep = paste0(round((sum(data$orig == data$kmeans) / denom) * 100), "%")
-
-    perc = c(avgp,sinp,comp,wardp,pamp,kmep)
-      return(perc)
+    perc = c(avgp, sinp, comp, wardp, pamp, kmep)
+    return(perc)
 }
 
 ## cluster  ben separati
-set.seed(10)
+set.seed(69)
 n=20; scale=1;
       mx=0; my=0; 
       x=rnorm(n)*scale+mx
@@ -47,8 +43,6 @@ n=20; scale=1;
 mat_well<-cbind(c(rep(1,n),rep(2,n),rep(3,n)),x,y)
 colnames(mat_well)<-c('G-vero','x','y')
 plot(x, y, pch = 19, col = mat_well[, 1])
-
-dfw = dfperc(dfcluster(mat_well))
 
 
 ### cluster poco separati
@@ -67,7 +61,6 @@ mat_poor<-cbind(c(rep(1,n),rep(2,n),rep(3,n)),x,y)
 colnames(mat_poor)<-c('G-vero','x','y')
 plot(x,y,pch=19,col=mat_poor[,1])
 
-dfp= dfcluster(mat_poor)
 
 ### cluster allungati
 set.seed(19);
@@ -84,8 +77,6 @@ mat_lunghi<-cbind(c(rep(1,n),rep(2,n)),x,y)
 colnames(mat_lunghi)<-c('G-vero','x','y')
 plot(x,y,pch=19,col=mat_lunghi[,1])
 
-dfl = dfcluster(mat_lunghi)
-
 ### cluster nonconvessi
 set.seed(10);
 n<-100
@@ -97,7 +88,7 @@ mat_nconv<-cbind(c(rep(1,n/2),rep(2,n/2)),x,y)
 colnames(mat_nconv)<-c('G-vero','x','y')
 plot(x,y,pch=19,col=mat_nconv[,1])
 
-dfperc(dfcluster(mat_well))
-dfperc(dfcluster(mat_poor))
-dfperc(dfcluster(mat_lunghi))
-dfperc(dfcluster(mat_nconv))
+dfcluster(mat_well)
+dfcluster(mat_poor)
+dfcluster(mat_lunghi)
+dfcluster(mat_nconv)
