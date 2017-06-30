@@ -121,13 +121,16 @@ inspect(gromilk[1:10])
 ####################################################################################
 
 # Preparo il dataset
-
+require(arules)
+require(datasets)
+require(arulesViz)
 db = read.csv2("~/Visual Studio 2017/Projects/MABIDA2017/Grassini/Esame/ARULES/2014_sqf_web.csv", header = T, sep = ";")
 summary(db)
 str(db, list=101)
 dbEse<-db[,c(c(7:8),c(17:26))]
 str(dbEse)
-dbEse$machgun <- NULL #.tolte su base summary
+# tolgo colonne inutili
+dbEse$machgun <- NULL 
 dbEse$riflshot<-NULL
 dbEse$asltweap<-NULL 
 dbEse[]<-lapply(dbEse, as.factor) #fattorizza variabili intere
@@ -141,16 +144,16 @@ summary(df)
 
 # Guardo gli oggetti più frequenti graficamente
 
-itemFrequencyPlot(trans3, topN=10, type="absolute", main="frequenze assolute")
-itemFrequencyPlot(trans3, topN=10, type="relative", main="frequenze relative")
+itemFrequencyPlot(df, topN = 10, type = "absolute", main = "frequenze assolute")
+itemFrequencyPlot(df, topN = 10, type = "relative", main = "frequenze relative")
 
 # Applico le regole associative con supporto 0.6 e confidenza 0.5
 
-rules<- apriori(trans3, 
+fr <- apriori(df,
                 parameter =list(support=.6,
                                 confidence=0.5,
                                 minlen=2,
                                 target="rules"))
 
-summary(rules)
-inspect(sort(rules[1:10], by="support", decreasing = T))
+summary(fr)
+inspectDT(sort(fr, by = "support", decreasing = T))
