@@ -1,7 +1,7 @@
 # Con variabile dipendente categorica/discreta
 #install.packages("C50")
 library(C50)
-setwd("F:/CORSO MIO 2017/ARULES")
+setwd("~/Visual Studio 2017/Projects/MABIDA2017/Grassini/Esame/Decision Trees/")
 crx <- read.table( file="expanded_AGARICUS_LEPIOTA.txt", header=TRUE, sep="," )
 head(crx)
 summary(crx)
@@ -56,7 +56,7 @@ library(rpart)
 library(rpart.plot)
 
 #### File (adjust path)
-file.data <- "F:/CORSO MIO 2017/TREE/Income-training.csv"
+file.data <- "~/Visual Studio 2017/Projects/MABIDA2017/Grassini/Esame/Decision Trees/Income-training.csv"
 remove <- c("", "Numero.di.FamiglieProvincia", "Numero.di.FamiglieRegione")
 #### Read data
 data <- read.table(file = file.data, header = TRUE, sep = ",", 
