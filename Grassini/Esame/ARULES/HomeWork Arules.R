@@ -6,6 +6,7 @@ library(datasets)
 library(arulesViz)
 data(Groceries)
 
+
 ####################################################################################
 
 # 1) Esplorare l'oggetto e capire come è fatto (che cosa contiene ecc.)
@@ -35,6 +36,7 @@ itemFrequencyPlot(Groceries, topN = 10, frequency = "relative")
 #3) Trovare le regole basate con supporto minimo equivalente a un numero prefissato di transazioni
 
 ####################################################################################
+options(digits = 2)
 rules = apriori(Groceries, parameter = list(support = 0.002, minlen = 2, target = "rules"))
 summary(rules)
 inspect(rules)
@@ -45,21 +47,13 @@ inspect(rules)
 
 ####################################################################################
 
-gro = apriori(
-    Groceries,
-    parameter = list(supp = 0.002,
-                     conf = 0.82,
-                     minlen = 2,
-                     target = 'rules'
-                    ))
+gro = apriori(Groceries, parameter = list(supp = 0.002, conf = 0.82, minlen = 2, target = 'rules'))
 
 # Ricordare: la lift è guale a P(B|A)
-
 options(digits = 2)
 gro = sort(gro, by = 'lift', decreasing = T)
 inspect(gro)
 summary(gro)
-# summary() mi da l'anatomia dell'oggetto gro
 
 ####################################################################################
 
@@ -68,13 +62,10 @@ summary(gro)
 ####################################################################################
 
 inspectDT(gro)
-plot(gro, xlim = c(0.002))
 plotly_arules(gro)
-plot(gro, xlim = c(0.002, 0.0035), ylim = C(0.80, 0.90))
 plot(gro, method = "grouped")
 plot(gro, method = "graph", interactive = TRUE, shading = NA)
 plot(gro, method = 'paracoord', control = list(reorder = TRUE))
-plotly_arules(arules)
 
 
 ####################################################################################
@@ -85,33 +76,15 @@ plotly_arules(arules)
 
 gro = sort(gro, by = "confidence", decreasing = TRUE)
 # intanto ordinerei per confidence visto che mi dice quanto sono sicuro che la regola valga
-inspect(gro[1:20])
+inspect(gro)
+
 ## Sono molto sicuro che:
-#[1]  {citrus fruit,root vegetables,soft cheese}                       => {other vegetables} 0.0010  1          5.2 
-#[2]  {pip fruit,whipped/sour cream,brown bread}                       => {other vegetables} 0.0011  1          5.2 
-#[3]  {tropical fruit,grapes,whole milk,yogurt}                        => {other vegetables} 0.0010  1          5.2 
-#[4]  {ham,tropical fruit,pip fruit,yogurt}                            => {other vegetables} 0.0010  1          5.2 
-#[5]  {ham,tropical fruit,pip fruit,whole milk}                        => {other vegetables} 0.0011  1          5.2 
-#[6]  {tropical fruit,butter,whipped/sour cream,fruit/vegetable juice} => {other vegetables} 0.0010  1          5.2 
-#[7]  {whole milk,rolls/buns,soda,newspapers}                          => {other vegetables} 0.0010  1          5.2 
-#[8]  {citrus fruit,tropical fruit,root vegetables,whipped/sour cream} => {other vegetables} 0.0012  1          5.2 
-
-# Le persone che comprano le combinazioni sopra descritte comprino sicuramente almeno altri vegetali.
-
-#9]  {rice,sugar}                                                     => {whole milk}       0.0012  1          3.9 
-#[10] {canned fish,hygiene articles}                                   => {whole milk}       0.0011  1          3.9 
-#[11] {root vegetables,butter,rice}                                    => {whole milk}       0.0010  1          3.9 
-#[12] {root vegetables,whipped/sour cream,flour}                       => {whole milk}       0.0017  1          3.9 
-#[13] {butter,soft cheese,domestic eggs}                               => {whole milk}       0.0010  1          3.9 
-#[14] {pip fruit,butter,hygiene articles}                              => {whole milk}       0.0010  1          3.9 
-#[15] {root vegetables,whipped/sour cream,hygiene articles}            => {whole milk}       0.0010  1          3.9 
-#[16] {pip fruit,root vegetables,hygiene articles}                     => {whole milk}       0.0010  1          3.9 
-#[17] {cream cheese ,domestic eggs,sugar}                              => {whole milk}       0.0011  1          3.9 
-#[18] {curd,domestic eggs,sugar}                                       => {whole milk}       0.0010  1          3.9 
-#[19] {cream cheese ,domestic eggs,napkins}                            => {whole milk}       0.0011  1          3.9 
-#[20] {tropical fruit,root vegetables,yogurt,oil}                      => {whole milk}       0.0011  1          3.9 
-
-# Stessa cosa con un lift inferiore (quindi meno probabile rispetto a sopra ma cmq quasi 4 volte più facile del normale) per quando riguarda il latte.
+#[1] {citrus fruit,tropical fruit,root vegetables,whole milk}        => {other vegetables} 0.0032  0.89       4.6 
+#[2] {pork,other vegetables,butter}                                  => {whole milk}       0.0022  0.85       3.3 
+#[3] {root vegetables,other vegetables,yogurt,fruit/vegetable juice} => {whole milk}       0.0020  0.83       3.3 
+#[4] {other vegetables,curd,domestic eggs}                           => {whole milk}       0.0028  0.82       3.2 
+#[5] {tropical fruit,herbs}                                          => {whole milk}       0.0023  0.82       3.2 
+#[6] {citrus fruit,root vegetables,other vegetables,yogurt}          => {whole milk}       0.0023  0.82       3.2 
 
 # Però sento di non avere il polso esatto di cosa stia succedendo...potrei fare un'operazione per remixare i dati prendendo in considerazione i singoli prodotti!
 
@@ -133,13 +106,7 @@ inspect(gromilk[1:10])
 # ora si che ci siamo!
 # modificando gromilk sono capace di ricavarmi tutte le inferenze che voglio per ogni singolo prodotto di mia scelta verso/contro ogni itemset!
 # credo che questo risponda anche all'esercizio due :)
-#Esercizio 2: regole associative
-#Sempre scegliendo uno dei due oggetti, condurre l'analisi stabilendo un item-corpo a scelta.
 
-
-gromilk2 <- apriori(data = Groceries, parameter = list(supp = 0.001, conf = 0.08), appearance = list(default = "rhs", lhs = "whole milk"), control = list(verbose = F))
-gromilk2 <- sort(gromilk2, decreasing = TRUE, by = "confidence")
-inspect(gromilk2[1:10])
 
 
 
