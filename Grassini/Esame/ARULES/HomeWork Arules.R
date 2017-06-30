@@ -151,7 +151,7 @@ itemFrequencyPlot(df, topN = 10, type = "relative", main = "frequenze relative")
 
 fr <- apriori(df,
                 parameter =list(support=.6,
-                                confidence=0.5,
+                                confidence=0.8,
                                 minlen=2,
                                 target="rules"))
 
