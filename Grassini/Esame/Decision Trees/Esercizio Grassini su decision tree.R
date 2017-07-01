@@ -35,7 +35,7 @@ model.1<-C5.0(trainX,trainy,costs=cost_matrix)
 summary(model.1)
 plot(model.1)
 
-# Usiamo model su test set per vedere se l'albero realizzato è generalizzabile
+# Usiamo model su test set per vedere se l'albero realizzato sul training è generalizzabile
 predizione<-predict(model.1,testX,type='class') ## classe assegnata dalla regola
 summary(predizione)
 table(testy,predizione)
@@ -108,6 +108,8 @@ ind <- which.min(fit$cptable[, "xerror"])
 # Potatura
 fit.prune <- prune(tree = fit, cp = fit$cptable[ind, "CP"]) 
 print(fit.prune)
+plot(fit.prune)
+text(fit.prune)
 
 # Valutiamo il modello sul data test
 dat<-datate[,c("Regione","Popolazione.TotaleProvincia","Numero.medio.di.componenti.per.famigliaProvincia",
@@ -121,4 +123,4 @@ plot(SE)
 
 summary(predizione)
 predizione[1:20]
-datate[,"gini.index"][1:20]
+datate[, "gini.index"][1:20]
