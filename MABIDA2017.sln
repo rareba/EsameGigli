@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26606.0
+VisualStudioVersion = 15.0.26621.2
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{DA7A21FA-8162-4350-AD77-A8D1B671F3ED}") = "Grassini", "Grassini\Grassini.rxproj", "{AEF468C9-D29C-4FF1-A2C5-8D4729012464}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{DA7A21FA-8162-4350-AD77-A8D1B671F3ED}") = "Gigli", "Gigli\Gigli.rxproj", "{D6B3C500-E2CF-4C99-BFA8-A75D47A85036}"
 EndProject
 Project("{DA7A21FA-8162-4350-AD77-A8D1B671F3ED}") = "Rampichini", "Rampichini\Rampichini.rxproj", "{0EA838EA-962B-4E7A-AC16-1A64EC500BE2}"
+EndProject
+Project("{DA7A21FA-8162-4350-AD77-A8D1B671F3ED}") = "Cipollini", "Cipollini\Cipollini.rxproj", "{72C45ED3-154F-4A6A-9FB2-432507D01039}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,8 +43,15 @@ Global
 		{0EA838EA-962B-4E7A-AC16-1A64EC500BE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0EA838EA-962B-4E7A-AC16-1A64EC500BE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0EA838EA-962B-4E7A-AC16-1A64EC500BE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72C45ED3-154F-4A6A-9FB2-432507D01039}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72C45ED3-154F-4A6A-9FB2-432507D01039}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72C45ED3-154F-4A6A-9FB2-432507D01039}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72C45ED3-154F-4A6A-9FB2-432507D01039}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {00827AD8-8BDF-48C8-8F37-66F45B83DDF3}
 	EndGlobalSection
 EndGlobal
