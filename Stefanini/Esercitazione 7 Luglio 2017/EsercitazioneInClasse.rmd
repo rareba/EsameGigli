@@ -1,0 +1,820 @@
+---
+title:"Gamma Latente"
+author:"FM Stefanini"
+date:"July  2017"
+output:html_document
+- --
+
+`` `{r setup, include=FALSE}
+myRelease<- c(
+   "13/02/2017 rel 1.3",
+   "11/04/2017 rel 2.1",
+   "4/05/2017 rel 3.0"
+   )
+#setwd("/media/fred/STORE/SAND32G/PRJ/1-2017-FOCI/1-2017-numero_foci_piastra/modelli_hoff_2012")
+#setwd("/home/fred/Dropbox/progresso/NUMfoci/1-2017-numero_foci_piastra/modelli_hoff_2012")
+
+## setwd("/home/fred/Dropbox/progresso/NUMFOCI_corrente/1-2017_numeroFociGAMMA")
+#library(knitr)
+library(rstan)
+
+knitr::opts_chunk$set(echo = TRUE)
+` ``
+
+
+
+# Dataset
+
+All partecipating laboratories used the same BALB / c 3 T3 cell lineage, from passage 17 to passage 21, and used the same batches of serum.
+
+
+
+
+
+## Data preparation and model definition
+
+We first load and prepare data
+`` `{r,message=F}
+##load(file.path(percorso,"contaFociDB_20160216.RData"))
+load("otoluidineCS.RData")
+
+## Indici per estrarre e righe di ogni concentrazione
+estrattoreRigheConc<- list()
+for(auxE in 1:9){
+  estrattoreRigheConc[[auxE]] <- which(as.numeric(workDF$dose) == auxE)
+  }
+
+(workDF[estrattoreRigheConc[[2]],])
+
+names(workDF)
+summary(workDF)
+
+##save(workDF,file="otoluidineCS.RData")
+` ``
+
+
+
+
+# Scatterplot
+
+`` `{r}
+plot(workDF$doseN,workDF$count)
+` ``
+
+
+
+# Model fitting
+
+
+## Poisson, dose 1000
+
+`` `{r}
+trattamento <- 7 # dose 1000
+tmpDF <- workDF[estrattoreRigheConc[[trattamento]],]
+tmpDF
+
+estrattore <- workDF$doseN ==1000
+tmpDF <- workDF[estrattore,]
+head(tmpDF)
+` ``
+
+Stima ML:
+`` `{r}
+lambdaDot <- mean(tmpDF$count)
+lambdaDot
+var(tmpDF$count)*9/10
+
+
+modPo <-glm(count ~ 1,data=tmpDF,family = "poisson")
+(coefficients(modPo))
+
+c(mean=lambdaDot, 
+  stimaML=exp(coefficients(modPo)),
+  varianza=var(tmpDF$count),
+  varianzaML=var(tmpDF$count)*9/10
+  )
+` ``
+
+
+Plot della pdf discreta:
+`` `{r}
+xgrid<- 0:7
+ygrid<- dpois(xgrid,lambdaDot)
+barplot(ygrid,names.arg = paste(xgrid))
+
+freAss<-xtabs(~factor(count,levels=0:7),data=tmpDF)
+freRel<-freAss/sum(freAss)
+freRel
+
+
+barplot(ygrid,names.arg = paste(xgrid),ylim=c(0,0.35))
+barplot(freRel,ylim=c(0,0.35),add=T,lty=2,lwd=2,col=4)
+barplot(c(0,0,0,ygrid[4:5],0,ygrid[7],0),
+        ylim=c(0,0.35),add=TRUE)
+
+` ``
+
+
+
+
+### MCMC 
+
+
+`` `{r}
+require(rstan)
+# set_cppo("fast")  # for best running speed
+` ``
+
+
+
+Dati.
+`` `{r,eval=FALSE}
+#######################################################################
+### ATTENZIONE ALLA RIASSEGNAZIONE DELLE CLASSI DI PUNTEGGIO
+myData <- list()# luogo dei dati
+myData$Yobs <- tmpDF$count  
+myData$N <- length(myData$Yobs)
+names(myData)
+##########################################################################
+` ``
+
+### Codice
+
+Stan code
+`` `{r}
+proG1 <- '
+data {
+    int<lower=1> N;
+    int<lower=0> Yobs[N];
+}
+transformed data{
+    
+}
+parameters {
+    real<lower=0> lambda;
+}
+transformed parameters{
+}
+model {
+   for(osser in 1:N){
+       Yobs[osser] ~ poisson(lambda);
+   }
+    
+   lambda ~ uniform(0,35);
+}
+'
+
+` ``
+
+`` `{r,eval=F}
+library(rstan)
+inizializza <-function(){
+              list(lambda = 7+runif(1,-6,+6))
+            }
+inizializza()
+
+
+iniTime <-date()
+fit <- stan(model_code = proG1, 
+            data       = myData, 
+            iter       = 15000, 
+            chains     = 3,
+            warmup = 5000,
+            thin = 5,
+            #control=list(adapt=0.8,adapt_delta  = 0.8,),
+            init= inizializza)
+endTime<-date();c(iniTime=iniTime, endTime=endTime)
+
+
+
+pairs(fit)
+summary(fit)
+plot(fit)
+traceplot(fit)
+
+
+getwd()
+save(fit,file="fit_1.RData")
+` ``
+
+
+`` `{r,eval=F}
+load(file="fit_1.RData")
+
+myla <- extract(fit, permuted = TRUE) # return a list of arrays 
+lambda <- myla$lambda 
+
+### return an array of three dimensions: iterations, chains, parameters 
+a <- extract(fit, permuted = FALSE) 
+
+### use S3 functions as.array (or as.matrix) on stanfit objects
+a2 <- as.array(fit)
+m <- as.matrix(fit)
+##
+` ``
+
+
+
+
+
+
+
+
+
+### Diagnostica e sintesi della a-posteriori
+
+`` `{r}
+load(file="fit_1.RData")
+
+myAr <- extract(fit, permuted = FALSE) # return an array 
+str(myAr)
+` ``
+
+### Analisi dell'output
+
+
+`` `{r}
+require(ggmcmc)
+fit_mc_list <- rstan::As.mcmc.list(fit)
+str(fit_mc_list)
+save(fit_mc_list,file="fit_mc_list_pois.Rdata")
+
+outSim = ggs(fit)
+print(outSim)
+` ``
+
+
+
+Creo file di supporto
+`` `{r}
+# ggmcmc(outSim)## produce file ggmcmc-output.pdf cartella corrente
+` ``
+
+### Traceplots
+
+`` `{r}
+library(ggthemes)
+ggs_traceplot(outSim) + theme_fivethirtyeight()
+` ``
+
+
+### Densità
+`` `{r}
+ggs_density(outSim) +   theme_solarized(light=TRUE)
+` ``
+
+
+### Riduzione di scala potenziale: 
+`` `{r}
+ggs_Rhat(outSim) + xlab("R_hat")
+` ``
+
+
+### Geweke
+
+
+`` `{r}
+ggs_geweke(outSim)
+` ``
+
+
+
+
+### Caterpillar plots
+
+Thick lines at the 90 % highest posterior density(HPD) region and thin lines at the 95 % HPD.
+`` `{r}
+ggs_caterpillar(outSim)
+` ``
+
+
+
+
+### Credible intervals
+
+Livello estremi Maiuscolo ci = c(0.05, 0.95),
+Livello estremi minuscolo ci = c(0.025, 0.975))
+`` `{r}
+ci(outSim)
+` ``
+
+
+
+
+###  Coppie di parametri
+`` `{r}
+ggs_pairs(outSim, lower = list(continuous = "density"))
+` ``
+
+
+
+
+
+### Riassunti numerici  e diagnostica
+
+`` `{r}
+summary(fit)# oggetto originale prodotto dalla simulazione
+` ``
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Distribuzioni predittive in STAN
+
+
+Uso MCMC per ottenere un campione dalla predittiva
+e fare diagnostica di modello via discrepancy variables.
+
+
+### Codice del modello
+Codice STAN:
+`` `{r}
+proG1pred <- '
+data {
+    int<lower=1> N;
+    int<lower=0> Yobs[N];
+}
+transformed data{
+   // real<lower=0> valA = 2.5;
+}
+parameters {
+    real<lower=0> lambda;
+}
+transformed parameters{
+}
+model {
+   for(osser in 1:N){
+       Yobs[osser] ~ poisson(lambda);
+   }
+    
+   lambda ~ uniform(0,35);
+}
+generated quantities{
+  int prediCount[10];
+  for(auxNS in 1:10){
+     prediCount[auxNS] = poisson_rng(lambda);
+  }
+}
+'
+
+
+` ``
+
+
+
+
+
+### Compilazione
+`` `{r}
+
+iniTime <-date()
+#
+mod <- stan_model(model_code = proG1pred)
+#
+endTime<-date();c(iniTime=iniTime, endTime=endTime)
+` ``
+
+
+
+### Campionamento
+`` `{r}
+system.time(
+fit <<- sampling(mod,
+                data= myData, 
+                pars=c("lambda","prediCount"),
+                chains     = 4,
+                iter = 25000,
+                warmup = 5000,
+                thin=5,
+                cores=3,
+                seed= 1999
+                #init= list( 
+                #      as.list(initPara()),
+                #      as.list(initPara()),
+                #      as.list(initPara()),
+                #     as.list(initPara())),
+                #,control= list(max_treedepth =10,
+                #              adapt_delta= 0.8 )
+                )
+)# time
+` ``
+
+
+
+
+
+`` `{r}
+require(ggmcmc)
+
+myPred <- extract(fit, "prediCount[1]",permuted = FALSE)
+myAr<-as.array(fit)
+str(myAr)
+
+
+#outSim = ggs(fit)
+#str(outSim)
+#ggs_density(outSim)
+#ggs_traceplot(outSim) + theme_fivethirtyeight()
+ 
+` ``
+
+
+
+## Sintesi numeriche discrepancy variables
+
+
+`` `{r}
+catena <- 1
+myAr[1:5,catena,2:11]
+
+# matrice aggragando catene
+simuCampio<-rbind(
+  myAr[,1,2:11],
+  myAr[,2,2:11],
+  myAr[,3,2:11],
+  myAr[,4,2:11]
+)
+dim(simuCampio)
+` ``
+
+
+
+`` `{r}
+# campione dalla predittiva
+sintesiPred<- function(vx){
+  
+  c(min=min(vx),
+    max=max(vx),
+    amCV = max(vx)-min(vx),
+    distinti = length(names(xtabs(~ vx))) 
+      )
+}
+
+sintesiPred(c(2,1,3,2,3,4,2,5))
+sintesiPred(myData$Yobs)
+` ``
+
+
+
+
+
+`` `{r}
+## Applico ai campioni simulati
+statPredDistri <- t(apply(simuCampio,1,sintesiPred))
+dim(statPredDistri)
+head((statPredDistri))
+` ``
+
+
+Esamino il campione reale verso la distribuzione predittiva
+`` `{r}
+campioSintesi <- sintesiPred(myData$Yobs)
+campioSintesi
+` ``
+
+Distribuzione del minimo:
+`` `{r}
+distriAss <-xtabs(~ min,data= statPredDistri)
+distriAss/sum(distriAss)
+campioSintesi[1]
+` ``
+
+
+Distribuzione del massimo:
+`` `{r}
+distriAss <-xtabs(~ max,data= statPredDistri)
+distriAss/sum(distriAss)
+campioSintesi[2]
+` ``
+
+Distribuzione dell 'ampiezza del campo di variazione:
+```{r}
+distriAss <-xtabs(~ amCV,data= statPredDistri)
+distriAss/sum(distriAss)
+campioSintesi[3]
+```
+
+Distribuzione del numero di conteggi distinti:
+```{r}
+distriAss <-xtabs(~ distinti,data= statPredDistri)
+distriAss/sum(distriAss)
+campioSintesi[4]
+```
+
+In nessun caso il campione mostra riassunti sulle code
+della distribuzione ottenuta attraverso la predittiva
+di campioni di uguale dimensione.
+
+ 
+
+
+ 
+
+
+### Codice del modello per Loo-CV
+Codice STAN:
+```{r}
+
+proG1Loo <- '
+data{
+    int < lower = 1 > N;
+    int < lower = 0 > Yobs[N];
+}
+transformed data{
+   / / real < lower = 0 > valA = 2.5;
+}
+parameters{
+    real < lower = 0 > lambda;
+}
+transformed parameters{
+}
+model{
+    for (osser in 1:N) {
+        Yobs[osser] ~ poisson(lambda);
+    }
+
+    lambda ~ uniform(0, 35);
+}
+generated quantities{
+    int prediCount[10];
+    vector[N] log_lik;
+    for (auxNS in 1:10) {
+        prediCount[auxNS] = poisson_rng(lambda);
+        log_lik[auxNS] = poisson_lpmf(Yobs[auxNS] | lambda);
+    }
+
+}
+'
+
+
+```
+
+
+
+
+
+### Compilazione
+```{r}
+
+iniTime <-date()
+#
+modLoo <- stan_model(model_code = proG1Loo)
+#
+endTime<-date();c(iniTime=iniTime, endTime=endTime)
+```
+
+
+
+### Campionamento
+```{r}
+system.time(
+fitLoo <<- sampling(modLoo,
+                data= myData, 
+                pars=c("lambda","prediCount","log_lik"),
+                chains     = 3,
+                iter = 25000,
+                warmup = 5000,
+                thin=5,
+                cores=3,
+                seed= 1999
+                #init= list( 
+                #      as.list(initPara()),
+                #      as.list(initPara()),
+                #      as.list(initPara()),
+                #     as.list(initPara())),
+                #,control= list(max_treedepth =10,
+                #              adapt_delta= 0.8 )
+                )
+)# time
+
+
+save(fitLoo,file="fitLoo.RData")
+
+```
+
+
+
+
+
+## Modello negative Binomial
+
+
+### Codice del modello
+Codice STAN:
+```{r}
+
+proG1NegBi <- '
+data{
+    int < lower = 1 > N;
+    int < lower = 0 > Yobs[N];
+}
+transformed data{
+
+}
+parameters{
+    real < lower = 0 > mu;
+    real < lower = 0 > phi;
+}
+transformed parameters{
+}
+model{
+    Yobs ~ neg_binomial_2(mu, phi);
+    mu ~ uniform(0.1, 30);
+    phi ~ uniform(0.01, 25);
+}
+generated quantities{
+    int prediCount[10];
+    vector[N] log_lik;
+    for (auxNS in 1:10) {
+        prediCount[auxNS] = neg_binomial_2_rng(mu, phi);
+        log_lik[auxNS] = neg_binomial_2_lpmf(Yobs[auxNS] | mu, phi);
+    }
+}
+'
+
+
+```
+
+
+
+
+
+### Compilazione e Campionamento
+```{r}
+
+iniTime <-date()
+#
+modNegBi <- stan_model(model_code = proG1NegBi)
+#
+endTime<-date();c(iniTime=iniTime, endTime=endTime)
+
+system.time(
+fitNegBi <<- sampling(modNegBi,
+                data= myData, 
+                pars=c("mu","phi","prediCount","log_lik"),
+                chains     = 3,
+                iter = 50000,
+                warmup = 25000,
+                thin=5,
+                cores=3,
+                seed= 1999,
+                init= list( 
+                      list(mu=1,phi=0.2),
+                      list(mu=5,phi=5),
+                      list(mu=10,phi=7)) 
+                ,control= list(max_treedepth =10,
+                              adapt_delta= 0.95 )
+                )
+)# time
+
+
+save(fitNegBi,file="fitNegBi.RData")
+
+```
+
+
+```{r}
+load(file="fitNegBi.RData")
+
+library(ggthemes)
+require(ggmcmc)
+
+fit_mc_list <- rstan::As.mcmc.list(fitNegBi)
+str(fit_mc_list)
+outSim = ggs(fitNegBi,family=c("mu"))
+ggs_traceplot(outSim) + theme_fivethirtyeight()
+
+
+outSim = ggs(fitNegBi,family=c("phi"))
+ggs_traceplot(outSim) + theme_fivethirtyeight()
+
+
+```
+
+
+### Densità
+```{r}
+ggs_density(outSim) +   theme_solarized(light=TRUE)
+```
+
+
+### Riduzione di scala potenziale: 
+```{r}
+ggs_Rhat(outSim) + xlab("R_hat")
+```
+
+
+### Geweke
+
+
+```{r}
+ggs_geweke(outSim)
+```
+
+
+
+
+### Caterpillar plots
+
+Thick lines at the 90% highest posterior density (HPD) region and thin lines at the 95% HPD.
+```{r}
+ggs_caterpillar(outSim)
+```
+
+
+
+
+### Credible intervals
+
+Livello estremi Maiuscolo ci = c(0.05, 0.95), 
+Livello estremi minuscolo ci = c(0.025, 0.975))
+```{r}
+ci(outSim)
+```
+
+ 
+
+
+###  Coppie di parametri
+```{r}
+ggs_pairs(outSim, lower = list(continuous = "density"))
+```
+
+
+
+ 
+
+### Riassunti numerici  e diagnostica
+
+```{r}
+summary(fit)# oggetto originale prodotto dalla simulazione
+```
+
+
+
+## Loo poisson verso negative binomial
+
+```{r}
+library("loo")
+
+log_lik_NegBin <- extract_log_lik(fitNegBi)
+loo_NegBin <- loo(log_lik_NegBin)
+print(loo_NegBin)
+
+
+log_lik_Poi <- extract_log_lik(fitLoo)# poisson
+loo_Poi <- loo(log_lik_Poi)
+print(loo_Poi)
+
+
+diff <- compare(loo_NegBin, loo_Poi)
+diff
+```
+
+ 
+```{r}
+save.image("ws.RData")
+```
+
+
+
+
+
+
+
+
+
+ 
+
+
+<!-- fine -->
+
+
+
+

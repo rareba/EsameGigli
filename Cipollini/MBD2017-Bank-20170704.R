@@ -29,7 +29,7 @@ library(glmnet)
 library(mgcv)
 library(rpart)
 library(ROCR)
-source("~/Cipo/Teaching/Master/MaBiDa/R/MBD2016-Functions-20160503.R")
+source("~/Visual Studio 2017/Projects/MABIDA2017/Cipollini/MBD2016-Functions-20160503.R")
 
 
 ################################################################################
@@ -37,7 +37,7 @@ source("~/Cipo/Teaching/Master/MaBiDa/R/MBD2016-Functions-20160503.R")
 ################################################################################
 
 ####
-file.data <- "~/Cipo/data/Large/BankMarketing/bank-additional-full.csv"
+file.data <- "~/Visual Studio 2017/Projects/MABIDA2017/Cipollini/data/bank-additional-full.csv"
 
 
 ################################################################################
@@ -159,10 +159,10 @@ forward <- step(object = null, scope = list(lower = null, upper = full),
 #### Fit
 fx <- FALSE    ## Try TRUE and FALSE; explain
 k  <- 12       ## Try different choices; explain
-# formula <- y ~ job + marital + education + default + housing + loan + contact + month + day_of_week + 
-# pdays + poutcome + nr.employed + emp.var.rate + cons.price.idx + cons.conf.idx + previousF +
-formula <- y ~ job + marital + education + default + housing + contact + month + day_of_week + 
-  pdays + nr.employed + emp.var.rate + cons.price.idx + cons.conf.idx + previousF +
+formula <- y ~ job + marital + education + default + housing + loan + contact + month + day_of_week + 
+pdays + poutcome + nr.employed + emp.var.rate + cons.price.idx + cons.conf.idx + previousF +
+#formula <- y ~ job + marital + education + default + housing + contact + month + day_of_week + 
+ # pdays + nr.employed + emp.var.rate + cons.price.idx + cons.conf.idx + previousF +
   s(age,            bs = "cr", k = k, fx = fx) + 
   s(campaign,       bs = "cr", k = k, fx = fx) + 
   s(euribor3m,      bs = "cr", k = k, fx = fx)  
