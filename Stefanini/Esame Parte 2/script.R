@@ -1,9 +1,15 @@
+
+####### INSTALLARE PRIMA DI ESEGUIRE
 #install.packages(c("bnlearn", "RBGL", "gRain", "igraph"))
+#source("https://bioconductor.org/biocLite.R")
+#biocLite("RBGL")
+#biocLite("graph")
+#biocLite("BiocGenerics")
 
 library(bnlearn)
 library(gRain)
 library(igraph)
-library(RBGL)
+
 
 # 1
 load("C:/Users/GiulioVannini/Documents/Visual Studio 2017/Projects/MABIDA2017/Stefanini/Esame Parte 2/insuranceDF.RData")
@@ -97,8 +103,6 @@ pcalg::dsep("PropCost", "RiskAversion", c("MakeModel", "DrivQuality", "Theft"), 
 
 
 # 7.2
-#source("https://bioconductor.org/biocLite.R")
-#biocLite("BiocGenerics")
 mod.2.fit <- bn.fit(mod.2, insuranceDF)
 ? simulate
 sim <- bnlearn::simulate(mod.2, nsim = 10000)
