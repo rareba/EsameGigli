@@ -1,6 +1,7 @@
 ---
-title: "Esame Parte 2 - Stefanini"
+title: "Esame Parte 2 - Bayesian Data Analysis (Stefanini)"
 output: html_document
+author: "Giulio Vannini"
 ---
 
 Per prima cosa procediamo a installare le librerie...non è una procedura banale in questo caso!
