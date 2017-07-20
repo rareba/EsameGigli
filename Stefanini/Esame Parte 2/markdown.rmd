@@ -1,0 +1,227 @@
+---
+title: "Esame Parte 2 - Stefanini"
+output: html_document
+---
+
+Per prima cosa procediamo a installare le librerie...non è una procedura banale in questo caso!
+
+```{r}
+####### INSTALLARE PRIMA DI ESEGUIRE
+#install.packages(c("bnlearn", "RBGL", "gRain", "igraph"))
+#source("https://bioconductor.org/biocLite.R")
+#biocLite("RBGL")
+#biocLite("graph")
+#biocLite("Rgraphviz")
+#biocLite("BiocGenerics")
+
+library(bnlearn)
+library(gRain)
+library(igraph)
+library(Rgraphviz)
+library(tidyverse)
+library(pcalg)
+library(dplyr)
+```
+
+# Esercizio 1
+Richiamate le librerie necessarie carico la workspace insuranceDF.RData. Quante unità statistiche contiene? Le varibili sono tutte oggetti fattore? Quanti missing values ci sono in ciascuna variabile?
+
+```{r}
+
+load("C:/Users/GiulioVannini/Documents/Visual Studio 2017/Projects/MABIDA2017/Stefanini/Esame Parte 2/insuranceDF.RData")
+nrow(insuranceDF)
+names(insuranceDF)
+str(insuranceDF)
+summary(insuranceDF)
+
+```
+
+Ci sono 10000 osservazioni per 27 variabili, tutte di tipo factor. Non ci sono dati mancanti!
+
+# Esercizio 2.1
+Effettuare l’apprendimento strutturale di una rete bayesiana impiegando hill climbing e score “bde”. Rappresentare in una figura il grafo ottenuto usando plot(). Per ogni nodo, stampare a schermo i suoi figli (hint: selezionare un sottodataframe ottenuto con arcs()).
+
+```{r}
+
+mod1 <- hc(insuranceDF, score = "bde")
+summary(mod1)
+mod1
+nodes(mod1)
+graphviz.plot(mod1)
+
+```
+
+# Esercizio 2.2
+Con la rete precedentemente ottenuta: estrarre gli archi orientati (hint:usa arcs()). Quanti archi orientati contiene? Trova i nodi radice della rete, ovvero quelli che sono senza parenti ma con discendenti, trova i nodi isolati, se ce ne sono (quelli senza parenti e senza figli).
+
+```{r}
+
+library(dplyr)
+(arcs <- mod1$arcs)
+nrow(directed.arcs(mod1))
+(directed.arcs(mod1))
+for (node in nodes(mod1)) {
+    print(paste0("Nodo ", node))
+    if (length(which(mod1$arcs[, 1] == node)) > 0)
+        print(mod1$arcs[which(mod1$arcs[, 1] == node), 2])
+    else
+        print("senza figli")
+    }
+
+for (node2 in root.nodes(mod1)) {
+    print(paste0("Nodo radice ", node2))
+    if (length(which(mod1$arcs[, 1] == node2)) == 0)
+        print(paste0("Nodo isolato ", node2))
+    else
+        print("Nodo non isolato")
+    }
+
+```
+
+Ci sono 27 nodi per 54 archi su un unico nodo radice. Non ci sono nodi isolati.
+
+# Esercizio 3
+Effettuare l’apprendimento strutturale di una rete bayesiana impiegando hill climbing con score “bde”: il risultato NON DEVE contenere gli archi orientati sotto riportati(opzione blacklist). Nella tabella qualsiasi altro denota tutti i nodi meno quella già considerato. Rappresentare in una figura il grafo ottenuto in output usando la funzione plot(). Quanti archi orientati contiene?
+
+```{r}
+
+bl1 <- cbind(names(insuranceDF[, -2]), rep("Age", length(names(insuranceDF[, -2]))))
+bl2 <- cbind(rep("PropCost", length(names(insuranceDF[, -20]))), names(insuranceDF[, -20]))
+bl3 <- cbind(rep("DrivHist", length(names(insuranceDF[, -27]))), names(insuranceDF[, -27]))
+bl <- rbind(bl1, bl2, bl3)
+mod.2 <- hc(insuranceDF, score = "bde", blacklist = bl)
+graphviz.plot(mod.2)
+nrow(directed.arcs(mod.2))
+directed.arcs(mod.2)
+
+```
+
+La rete contiene 56 archi orientati.
+
+# Esercizio 4.1
+Effettuare l'apprendimento strutturale di una rete bayesiana impiegando hill climbing con score “bic”: assicurarsi che il risultato contenga gli archi orientati sotto riportati (opzione whitelist). Rappresentare in una figura il grafo ottenuto in output usando la funzione plot(). Quanti archi orientati contiene?
+
+```{r}
+
+wl <- rbind(c("SeniorTrain", "ThisCarDam"), c("MedCost", "RuggedAuto"), c("SocioEcon", "GoodStudent"),
+          c("Age", "RiskAversion"), c("Age", "ThisCarDam"), c("RuggedAuto", "VehicleYear"))
+mod.3 <- hc(insuranceDF, score = "bic", whitelist = wl)
+plot(mod.3)
+nrow(directed.arcs(mod.3))
+directed.arcs(mod.3)
+
+```
+
+La rete ha 45 archi orientati.
+
+# Esercizio 4.2
+Esegui il codice seguente e cambiare posizione degli archi del DAG con mouse (fatto)
+
+```{r}
+
+modello3 <- graph_from_data_frame(arcs(mod.3), directed = TRUE, vertices = NULL)
+plot(modello3)
+idbn <- tkplot(modello3)
+tk_set_coords(idbn, 2 * tk_coords(idbn))
+coordinate <- tk_coords(idbn, norm = FALSE)
+tk_close(idbn)
+
+```
+
+# Esercizio 5
+Confrontare le due reti ottenute con hill climbing con blacklist verso whitelist usando compare()
+
+```{r}
+
+bnlearn::compare(mod.2, mod.3, arcs = FALSE)
+bnlearn::compare(mod.2, mod.3, arcs = TRUE)
+
+```
+
+Le due reti hanno 38 archi uguali.
+
+# Esercizio 6
+Considera il DAG ottenuto al punto (3). Stima i parametri di tale rete bayesiana con bn.fit(). Estrai la distribuzione di probabilità condizionata di “Theft” condizionata a “ThisCarCost = TenThou” e “ThisCarDam = Moderate”.
+
+```{r}
+
+fit = bn.fit(mod.3, insuranceDF)
+mod.3$arcs[which(mod.3$arcs[, 2] == "Theft")]
+theftProb <- fit$Theft
+bn.fit.barchart(theftProb)
+bn.fit.dotplot(theftProb)
+
+theftProbab <- as.data.frame(fit$Theft$prob)
+str(theftProbab)
+freq <- filter(theftProbab, ThisCarCost == "TenThou", ThisCarDam == "Moderate")
+freq
+
+```
+
+La probabilità che la macchina sia rubata per un costo di decine di migliaia di dollari e con danni di moderata entità è molto bassa
+
+# Esercizio 7.1
+Impiegando il DAG ottenuto come mod2, stabilire se PropCost è indipendente da RiskAversion condizionatamente a MakeModel,DrivQuality,Theft usando un teorema di separazione per DAG.
+
+```{r}
+
+require(pcalg)
+mod.2.graphnel <- as.graphNEL(mod.2)
+pcalg::dsep("PropCost", "RiskAversion", c("MakeModel", "DrivQuality", "Theft"), mod.2.graphnel)
+
+```
+
+Propcost non è indipendente da RiskAdversion alle condizioni sopra richieste!
+
+# Esercizio 7.2
+Con simulate genera via simulazione Monte Carlo un dataset di 10000 realizzazioni della rete ottenuta come mod2. Stampa a schermo le distribuzioni marginali delle frequenze relative di ogni variabile per tale dataset simulato.
+
+```{r}
+
+mod.2.fit <- bn.fit(mod.2, insuranceDF)
+mod2gr <- as.grain(mod.2.fit)
+sim <- simulate(mod2gr, nsim = 10000)
+str(sim)
+
+modsim <- hc(sim, score = "bde")
+d <- graphviz.plot(modsim);
+plot(d, main = "Simulation of Bayesian Network", attrs = list(node = list(fillcolor = "yellow", fontsize = 70),
+            edge = list(color = "black"),
+            graph = list(rankdir = "UD")))
+
+for (var in names(sim)) {
+    print(sim %>%
+          group_by_(var) %>%
+          summarise(n = n()) %>%
+          mutate(freq = n / sum(n)))
+}
+
+```
+
+# Esercizio 8
+Dalla rete ottenuta come mod.2, si assuma di aver rilevato le evidenze seguenti:
+Age sia “Adult”; RiskAversion sia “Psychopath”; AntiTheft sia “True”; MakeModel sia “SportCar”; *PropCost sia “HundredThou”;
+Crea un oggetto gRain basato su mod.2 e calcola la probabilità condizionata dell’evento CarValue = “FiftyThou” date le evidenze sopra elencate. Confronta tale valore di probabilità con il valore prima di inserire l’evidenza (prima del condizionamento).
+
+```{r}
+
+mod2grain <- as.grain(mod.2.fit)
+MPCarValue <- querygrain(mod2grain, nodes = c("CarValue"))
+MPCarValue[[1]]["FiftyThou"]
+
+ev <- list(Age = "Adult",
+                 RiskAversion = "Psychopath",
+                 AntiTheft = "True",
+                 MakeModel = "SportsCar",
+                 PropCost = "HundredThou")
+
+CarValueCond <- querygrain(mod2grain, nodes = c("CarValue"), evidence = ev)
+CarValueCond[[1]]["FiftyThou"]
+
+MPCarValue[[1]]["FiftyThou"] - CarValueCond[[1]]["FiftyThou"]
+
+```
+
+La probabilità condizionata dell'evento CarValue = "FiftyThou" è 0.09868044.
+Dopo il condizionamento diventa del 0.0971415, perdendo lo 0.001538944
+
