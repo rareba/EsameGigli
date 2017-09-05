@@ -1,0 +1,134 @@
+Purpose: 
+To predict how many comments a post on a Facebook Page is expected to receive in the 24 hours after a given base time. 
+
+
+Variables:
+
+Page features:
+1. PgPopularity = Popularity of the source of the document. 
+2. PgViews = How many individuals so far visited this place. This feature is only associated with the places eg:some institution, place, theater etc. 
+3. PgTalking = Daily interest of individuals towards source of the document/ Post: the people who actually come back to the page, after liking the page. This include activities such as comments, likes to a post, shares, etc by visitors to the page. 
+4. PgCategory = Category of the source of the document (eg: place, institution, brand etc) according to the following codes: 
+    1 = Product/service
+    2 = Public figure
+    3 = Retail and consumer merchandise
+    4 = Athlete
+    5 = Education website
+    6 = Arts/entertainment/nightlife
+    7 = Aerospace/defense
+    8 = Actor/director
+    9 = Professional sports team
+   10 = Travel/leisure
+   11 = Arts/humanities website
+   12 = Food/beverages
+   13 = Record label
+   14 = Movie
+   15 = Song
+   16 = Community
+   17 = Company
+   18 = Artist
+   19 = Non-governmental organization (ngo)
+   20 = Media/news/publishing
+   21 = Cars
+   22 = Clothing
+   23 = Local business
+   24 = Musician/band
+   25 = Politician
+   26 = News/media website
+   27 = Education
+   28 = Author
+   29 = Sports event
+   30 = Restaurant/cafe
+   31 = School sports team
+   32 = University
+   33 = Tv show
+   34 = Website
+   35 = Outdoor gear/sporting goods
+   36 = Political party
+   37 = Sports league
+   38 = Entertainer
+   39 = Church/religious organization
+   40 = Non-profit organization
+   41 = Automobiles and parts
+   42 = Tv channel
+   43 = Telecommunication
+   44 = Entertainment website
+   45 = Shopping/retail
+   46 = Personal blog
+   47 = App page
+   48 = Vitamins/supplements
+   49 = Professional services
+   50 = Movie theater
+   51 = Software
+   52 = Magazine
+   53 = Electronics
+   54 = SchoolJust for fun
+   55 = Club
+   56 = Comedian
+   57 = Sports venue
+   58 = Sports/recreation/activities
+   59 = Publisher
+   60 = Tv network
+   61 = Health/medical/pharmacy
+   62 = Studio
+   63 = Home decor
+   64 = Jewelry/watches
+   65 = Writer
+   66 = Health/beauty
+   67 = Music video
+   68 = Appliances
+   69 = Computers/technology
+   70 = Insurance company
+   71 = Music award
+   72 = Recreation/sports website
+   73 = Reference website
+   74 = Business/economy website
+   75 = Bar
+   76 = Album
+   77 = Games/toys
+   78 = Camera/photo
+   79 = Book
+   80 = Producer
+   81 = Landmark
+   82 = Cause
+   83 = Undefined
+   84 = Organization
+   85 = Tv/movie award
+   86 = Hotel
+   87 = Health/medical/pharmaceuticals
+   88 = Transportation
+   89 = Local/travel website
+   90 = Musical instrument
+   91 = Radio station
+   92 = Other
+   93 = Computers
+   94 = Phone/tablet
+   95 = Coach
+   96 = Tools/equipment
+   97 = Internet/software
+   98 = Bank/financial institution
+   99 = Society/culture website
+  100 = Small business
+  101 = News personality
+  102 = Teens/kids website
+  103 = Government official
+  104 = Photographer
+  105 = Spas/beauty/personal care
+  106 = Video game
+5-29 PgMin*, PgMax*, PgAve*, PgMdn*, PgSd* (* = 1, ..., 5) = min, max, average, median, standard deviation of 5 essential features of the page.
+
+Post features:
+30. PsCBefore = Number of post comments before the selected base date/time. 
+31. PsCLast24 = Number of post comments in last 24 hours before the base date/time. 
+32. PsCLast48.24 = Number of post comments in last 48 to last 24 hours before the base date/time. 
+33. PsCFirst24 = Number of post comments in the first 24 hours after the publication of post but before the base date/time. 
+34. PsCDiff = PsCLast24 - PsCLast48.24 
+35. BaseTime = (0-71) Base time. The 24 hours of the day are divided in pieces of 20 minutes. The target variable 
+36. PsChrs = Number of character of the post. 
+37. PsShares = Number of shares of the post, i.e. how many peoples shared this post on to their timeline. 
+38. PsPromotion = To reach more people with posts in News Feed, people promote their post and this features tells that whether the post is promoted(1) or not(0). 
+39. PsPubliDW = Day of the week on which the post was published. 
+40. PsBaseTimeDW = Day of the week of the selected base time. 
+
+Target variable:
+41. PsC24 = Number of post comments in the 24 hours after the base time.
