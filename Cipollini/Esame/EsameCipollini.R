@@ -3,11 +3,12 @@ library(glmnet)
 library(mgcv)
 library(rpart)
 library(ROCR)
+source("~/Visual Studio 2017/Projects/MABIDA2017/Cipollini/MBD2016-Functions-20160503.R")
 
 ### Parte 1
 
-fb.train <- read.table(file = "~/Visual Studio 2017/Projects/MABIDA2017/Cipollini/Esame/data/Facebook-Training.txt", header = TRUE, sep = "\t", na.strings = "NA")
-fb.test <- read.table(file = "~/Visual Studio 2017/Projects/MABIDA2017/Cipollini/Esame/data/Facebook-Test.txt", header = TRUE, sep = "\t", na.strings = "NA")
+train <- read.table(file = "~/Visual Studio 2017/Projects/MABIDA2017/Cipollini/Esame/data/Facebook-Training.txt", header = TRUE, sep = "\t", na.strings = "NA")
+test <- read.table(file = "~/Visual Studio 2017/Projects/MABIDA2017/Cipollini/Esame/data/Facebook-Test.txt", header = TRUE, sep = "\t", na.strings = "NA")
 
 ################################################################################
 ## Modeling settings (useful to avoid repetitions across approaches)
@@ -15,80 +16,49 @@ fb.test <- read.table(file = "~/Visual Studio 2017/Projects/MABIDA2017/Cipollini
 
 #### Variables
 yVar <- "PsC24"
-xVar <- colnames(fb.test)
-
-################################################################################
-## Stepwise selection
-################################################################################
-
-#### Null model
-formula <- as.formula(paste0(yVar, " ~ 1"))
-null <- lm(formula = formula, data = fb.train)
-#### Full model
-formula <- as.formula(paste0(yVar, " ~ 1 + ", paste0(xVar, collapse = " + ")))
-full <- lm(formula = formula, data = fb.train)
-
-#### FORWARD
-#### Use k = 2 for AIC, k = log(NROW(data)) for BIC
-forward <- step(object = null, scope = list(lower = null, upper = full),
-  direction = "forward", k = 2)
-
-#### BACKWARD
-#### Use k = 2 for AIC, k = log(NROW(data)) for BIC
-backward <- step(object = full, scope = list(lower = null, upper = full),
-  direction = "backward", k = 2)
-
-#### BOTH
-#### Use k = 2 for AIC, k = log(NROW(data)) for BIC
-both <- step(object = null, scope = list(lower = null, upper = full),
-  direction = "both", k = 2)
-
-
+xVar <- colnames(train[,-41])
 
 ################################################################################
 ## Ridge Regression
 ################################################################################
+
+#### Ridge
+alpha = 0
+
+#### Data
+y = train[, yVar]
+x <- .indVars(data = train, xVar = xVar, constant = FALSE)
+
+# Assegno subito best lambda
+cvfitr <- cv.glmnet(x = x, y = y, alpha = alpha, family = "poisson", type.measure = "mse", nfolds = 5)
+cat("min(lambda) = ", cvfitr$lambda.min, "1se(lambda) = ", cvfitr$lambda.1se, "\n")
+lambdaridge <- cvfitr$lambda.1se
+
+ridge.mod <- glmnet(x, y, family = "poisson", alpha = alpha, lambda = lambdaridge)
 
 
 ################################################################################
 ## Lasso Regression
 ################################################################################
 
+#### Lasso
+alpha = 1
 
+#### Data
+y <- train[, yVar]
+x <- .indVars(data = train, xVar = xVar, constant = FALSE)
 
+# Assegno subito best lambda
+cvfitl <- cv.glmnet(x = x, y = y, alpha = alpha, family = "poisson", type.measure = "mse", nfolds = 5)
+cat("min(lambda) = ", cvfitl$lambda.min, "1se(lambda) = ", cvfitl$lambda.1se, "\n")
+lambdalasso <- cvfitl$lambda.1se
 
-################################################################################
-## GAM 
-################################################################################
+lasso.mod <- glmnet(x, y, family = "poisson", alpha = alpha, lambda = lambdalasso)
 
-formula <- y ~ job + marital +
+predict(ridge.mod, type = 'response', s = lambdaridge)
 
-fit <- gam(formula = formula, family = binomial, data = fb.train, method = "P-ML", scale = 0)
+predict(lasso.mod, type = 'response', s = lambdalasso)
 
-#### Give a look to summary(); a look to plot
-# plot(x = fit, residuals = TRUE, rug = TRUE, se = TRUE, pages = 4, scale = -1)
-
-#### So tedious?
-# test.all <- .gam.ftest.all(fit = fit)
-
-
-################################################################################
-## Recursive Partitioning: 1st try
-################################################################################
-
-
-
-
-################################################################################
-## Recursive Partitioning: 2nd try
-################################################################################
-
-
-
-
-################################################################################
-## Final check: k-fold cv
-################################################################################
 
 
 
@@ -97,8 +67,8 @@ fit <- gam(formula = formula, family = binomial, data = fb.train, method = "P-ML
 
 ### Parte 2
 
-sp.train <- read.table(file = "~/Visual Studio 2017/Projects/MABIDA2017/Cipollini/Esame/Spam-Training.txt", header = TRUE, sep = "\t", na.strings = "NA")
-sp.test <- read.table(file = "~/Visual Studio 2017/Projects/MABIDA2017/Cipollini/Esame/Spam-Test.txt", header = TRUE, sep = "\t", na.strings = "NA")
+train <- read.table(file = "~/Visual Studio 2017/Projects/MABIDA2017/Cipollini/Esame/Spam-Training.txt", header = TRUE, sep = "\t", na.strings = "NA")
+test <- read.table(file = "~/Visual Studio 2017/Projects/MABIDA2017/Cipollini/Esame/Spam-Test.txt", header = TRUE, sep = "\t", na.strings = "NA")
 
 ################################################################################
 ## Stepwise selection
