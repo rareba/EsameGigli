@@ -55,9 +55,9 @@ lambdalasso <- cvfitl$lambda.1se
 
 lasso.mod <- glmnet(x, y, family = "poisson", alpha = alpha, lambda = lambdalasso)
 
-predict(ridge.mod, type = 'response', s = lambdaridge)
+results_ridge = predict(ridge.mod, x, type = 'response')
 
-predict(lasso.mod, type = 'response', s = lambdalasso)
+results_lasso = predict(lasso.mod, x, type = 'response')
 
 
 
