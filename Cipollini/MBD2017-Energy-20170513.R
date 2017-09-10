@@ -175,7 +175,7 @@ y <- train[, yVar]
 x <- .indVars(data = train, xVar = xVar, constant = FALSE)
 
 #### Fit (more options omitted)
-fit <- glmnet(x = x, y = y, family = "gaussian", alpha = alpha, 
+fit <- glmnet(x = x, y = y, family = "poisson", alpha = alpha, 
   nlambda = 100, standardize = TRUE)
 fit.ridge <- fit
 #### Print output (Explain columns Df and %Dev)
@@ -205,7 +205,7 @@ plot(x = fit, xvar = "dev",    label = TRUE) ## R^2
 #### Which one is the best lambda?
 # lambda <- exp( seq(from = -8, to = 2, by = 0.1) )
 cvfit <- cv.glmnet(x = x, y = y, alpha = alpha,             # lambda = lambda, 
-  family = "gaussian", type.measure = "mse", nfolds = 20)
+  family = "poisson", type.measure = "mse", nfolds = 20)
 par( mfrow = c(1,1) )
 plot(cvfit)
 
@@ -214,7 +214,7 @@ cat("min(lambda) = ", cvfit$lambda.min, "1se(lambda) = ", cvfit$lambda.1se, "\n"
 
 #### Estimate best
 lambda <- cvfit$lambda.1se 
-fit <- glmnet(x = x, y = y, family = "gaussian", alpha = alpha, 
+fit <- glmnet(x = x, y = y, family = "poisson", alpha = alpha, 
   lambda = lambda, standardize = TRUE)
 
 #### Store
