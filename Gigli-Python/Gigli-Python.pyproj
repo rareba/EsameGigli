@@ -22,6 +22,17 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="corriere_crawl.py" />
+    <Compile Include="corriere_crawl_2.py" />
+    <Compile Include="corriere_crawl_3.py" />
+    <Compile Include="ikea_crawl.py" />
+    <Compile Include="module1.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="text_processing.py" />
+    <Compile Include="Usa_Fanpage.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="get_fanpage_teaching_class.py" />
     <Compile Include="Gigli_Python.py" />
   </ItemGroup>
@@ -32,6 +43,14 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="data\" />
+    <Folder Include="pages2\" />
+    <Folder Include="pages2\" />
+    <Folder Include="pages2\corriere\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="nytimes_facebook_statuses.csv" />
+    <Content Include="nytimes_facebook_statuses_comments.csv" />
+    <Content Include="nytimes_facebook_statuses_reactions.csv" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

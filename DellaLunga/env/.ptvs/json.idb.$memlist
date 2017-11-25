@@ -13,3 +13,4 @@ decoder
 _default_decoder
 _default_encoder
 __version__
+tests
